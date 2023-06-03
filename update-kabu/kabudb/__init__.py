@@ -62,12 +62,12 @@ class SymbolsConnector(Connector):
         } for row in rows]
 
     def save_one(self, symbol: Symbol):
-        # TODO: 区分コードも更新する
         sql = """
             UPDATE symbols
             SET
                 name = %s,
                 exchange_code = %s,
+                division_code = %s,
                 bis_category_code = %s,
                 total_stocks = %s,
                 fiscal_year_end_basic = %s
@@ -77,8 +77,23 @@ class SymbolsConnector(Connector):
         super().save(sql, params=(
             symbol.symbolName,
             symbol.exchange,
+            self._e2d(symbol.exchangeName),
             symbol.bisCategory,
             symbol.totalStocks,
             symbol.fiscalYearEndBasic,
             symbol.symbolCode
         ))
+
+    def _e2d(self, e):
+        return {
+            "東証プ":      "01",
+            "東証ス":      "02",
+            "東証グ":      "03",
+            "東証プ外":    "11",
+            "東証ス外":    "12",
+            "東証グ外":    "13",
+            "東証ETF/ETN": "21",
+            "東証REIT":    "22",
+            "東証監理":    "31",
+            "東証整理":    "32",
+        }.get(e)

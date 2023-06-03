@@ -27,11 +27,11 @@ class KabusAPI(object):
         if 200 == res.status_code:
             return res.json()
         else:
-            print(res.json())
+            print(f"Failed to get symbol. Symbol: {code}@{exchange} Response: {res.json()}")
             return None
 
     def put_unregister(self, code, exchange):
         put = { "Symbols": [{ "Symbol": code, "Exchange": exchange }]}
         res = requests.put(f"{self.url}/unregister", headers=self.headers, json=put)
         if 200 != res.status_code:
-            print(res.json())
+            print(f"Failed to put unregister. Symbol: {code}@{exchange} Response: {res.json()}")

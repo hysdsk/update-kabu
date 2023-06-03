@@ -16,7 +16,7 @@ def main():
             connector.save_one(Symbol(symbol))
         else:
             with open("errors.txt", mode="a", encoding="utf-8") as f:
-                f.write(f"{t['code']}, t['exchange_code']\n")
+                f.write(f"{t['code']}@{t['exchange_code']}\n")
         # 進捗表示
         print(f"Symbol: {t['code']} ... {(count:=count+1)}/{total}")
         time.sleep(0.2)
