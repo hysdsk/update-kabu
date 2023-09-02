@@ -69,6 +69,7 @@ class SymbolsConnector(Connector):
                 exchange_code = %s,
                 division_code = %s,
                 bis_category_code = %s,
+                total_market_value = %s,
                 total_stocks = %s,
                 fiscal_year_end_basic = %s
             WHERE
@@ -79,6 +80,7 @@ class SymbolsConnector(Connector):
             symbol.exchange,
             self._e2d(symbol.exchangeName),
             symbol.bisCategory,
+            symbol.totalMarketValue,
             symbol.totalStocks,
             symbol.fiscalYearEndBasic,
             symbol.symbolCode
