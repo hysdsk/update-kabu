@@ -1,5 +1,5 @@
 from configparser import ConfigParser
-from mysql import connector as mc
+from mysql.connector.pooling import MySQLConnectionPool
 
 class Symbol(object):
     def __init__(self, rawdata):
@@ -25,23 +25,28 @@ class Connector(object):
     def __init__(self):
         config = ConfigParser()
         config.read("config.ini")
-        self.host = config["database"]["db_host"]
-        self.user = config["database"]["db_user"]
-        self.pswd = config["database"]["db_pswd"]
-        self.name = config["database"]["db_name"]
+        self.cnxpool = MySQLConnectionPool(
+            host=config["database"]["db_host"],
+            user=config["database"]["db_user"],
+            password=config["database"]["db_pswd"],
+            database=config["database"]["db_name"],
+            pool_size=5)
 
     def find(self, sql, params=None):
-        with mc.connect(host=self.host, user=self.user, password=self.pswd, database=self.name) as connection:
-            cursor = connection.cursor()
-            cursor.execute(sql, params)
-            return cursor.fetchall()
+        cnx = self.cnxpool.get_connection()
+        cursor = cnx.cursor()
+        cursor.execute(sql, params)
+        rows = cursor.fetchall()
+        cnx.close()
+        return rows
     
     def save(self, sql, params):
-        with mc.connect(host=self.host, user=self.user, password=self.pswd, database=self.name) as connection:
-            cursor = connection.cursor()
-            cursor.execute(sql, params)
-            cursor.close()
-            connection.commit()
+        cnx = self.cnxpool.get_connection()
+        cursor = cnx.cursor()
+        cursor.execute(sql, params)
+        cursor.close()
+        cnx.commit()
+        cnx.close()
 
 class SymbolsConnector(Connector):
     def __init__(self):
